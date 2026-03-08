@@ -1,0 +1,311 @@
+{% extends 'index.html' %} 
+{% load static %}
+
+{% block title %}Traductor en Vivo - Handy{% endblock %} 
+
+{% block extra_css %}
+<style>
+  /* Animación de pulsación para el punto rojo */
+  @keyframes pulse-red {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+  }
+
+  .window-card {
+    border: none; border-radius: 1rem; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+    overflow: hidden; height: 100%; display: flex; flex-direction: column;
+  }
+
+  .card-header-custom {
+    background-color: #fff; border-bottom: 1px solid #f0f0f0;
+    padding: 1.2rem; font-weight: 700; color: #333;
+  }
+
+  #video-wrapper {
+    position: relative; background-color: #f8f9fa; border-radius: 0.5rem;
+    overflow: hidden; min-height: 350px; 
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  @media (max-width: 768px) {
+    #video-wrapper { min-height: 250px; }
+    #text-output { min-height: 150px; font-size: 1.1rem; }
+  }
+
+  #webcam {
+    width: 100%; height: 100%; object-fit: cover;
+    transform: scaleX(-1); display: none; 
+  }
+
+  #camera-placeholder { text-align: center; color: #adb5bd; }
+  #camera-placeholder i { font-size: 4rem; margin-bottom: 10px; display: block; }
+
+  .status-badge {
+    position: absolute; top: 15px; left: 15px; z-index: 10;
+    background: rgba(255,255,255,0.9); padding: 5px 12px;
+    border-radius: 20px; font-size: 0.8rem; font-weight: bold;
+    display: flex; align-items: center; gap: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  .rec-dot {
+    width: 10px; height: 10px; background-color: #dc3545;
+    border-radius: 50%; display: inline-block;
+  }
+  .rec-active .rec-dot { animation: pulse-red 2s infinite; }
+
+  #text-output {
+    font-size: 1.3rem; line-height: 1.6; min-height: 200px;
+    background-color: #f8f9fa; border-radius: 0.5rem; border: 2px dashed #dee2e6;
+  }
+  
+  .control-panel { background: white; padding: 1rem; border-top: 1px solid #eee; }
+</style>
+{% endblock %} 
+
+{% block content %}
+
+<div class="row g-4">
+  
+  <div class="col-lg-6 order-1 order-lg-1">
+    <div class="card window-card">
+      <div class="card-header-custom d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-camera-video text-primary me-2"></i>Entrada Visual</span>
+        <span id="cam-status-text" class="badge bg-secondary rounded-pill fw-normal">Inactiva</span>
+      </div>
+
+      <div class="card-body d-flex flex-column">
+        <div id="video-wrapper" class="flex-grow-1 mb-3">
+          <div id="recording-badge" class="status-badge text-secondary">
+            <span class="rec-dot"></span> <span id="rec-text">OFF</span>
+          </div>
+          <div id="camera-placeholder">
+            <i class="bi bi-camera-video-off"></i>
+            <p>La cámara está desactivada</p>
+          </div>
+          <video id="webcam" autoplay playsinline muted></video>
+        </div>
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button id="btn-start" class="btn btn-primary btn-lg shadow-sm" onclick="startCamera()">
+            <i class="bi bi-power"></i> Iniciar
+          </button>
+          <button id="btn-stop" class="btn btn-outline-danger btn-lg d-none" onclick="stopCamera()" disabled>
+            <i class="bi bi-stop-circle"></i> Detener
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6 order-2 order-lg-2">
+    <div class="card window-card">
+      <div class="card-header-custom">
+        <i class="bi bi-chat-square-quote text-primary me-2"></i>Traducción en Tiempo Real
+      </div>
+      
+      <div class="card-body d-flex flex-column">
+        <div id="text-output" class="p-3 text-muted flex-grow-1 d-flex align-items-center justify-content-center text-center">
+          <span>Presiona "Iniciar" para comenzar...<br><small>La traducción aparecerá aquí</small></span>
+        </div>
+      </div>
+
+      <div class="control-panel d-flex justify-content-between align-items-center">
+        <small class="text-muted">Estado: Listo</small>
+        <div class="btn-group">
+            <button class="btn btn-light border text-muted" onclick="copyText()" title="Copiar">
+                <i class="bi bi-clipboard"></i>
+            </button>
+            <button class="btn btn-light border text-danger" onclick="clearText()" title="Borrar">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %} 
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+<script>
+  const videoElement = document.getElementById("webcam");
+  const placeholder = document.getElementById("camera-placeholder");
+  const btnStart = document.getElementById("btn-start");
+  const btnStop = document.getElementById("btn-stop");
+  const badge = document.getElementById("recording-badge");
+  const recText = document.getElementById("rec-text");
+  const camStatusText = document.getElementById("cam-status-text");
+  const textOutput = document.getElementById("text-output");
+  let mediaStream = null;
+  let hands = null;
+  let isDetecting = false;
+  let lastPrediction = '';
+  let predictionCount = 0;
+
+  function recognizeGesture(landmarks) {
+    const thumb = landmarks[4];
+    const index = landmarks[8];
+    const middle = landmarks[12];
+    const ring = landmarks[16];
+    const pinky = landmarks[20];
+    
+    const indexUp = index.y < landmarks[6].y;
+    const middleUp = middle.y < landmarks[10].y;
+    const ringUp = ring.y < landmarks[14].y;
+    const pinkyUp = pinky.y < landmarks[18].y;
+    const thumbUp = thumb.y < landmarks[3].y;
+    
+    if (!indexUp && !middleUp && !ringUp && !pinkyUp) return 'A';
+    if (indexUp && middleUp && !ringUp && !pinkyUp) return 'V';
+    if (indexUp && middleUp && ringUp && pinkyUp && !thumbUp) return 'B';
+    if (thumbUp && !indexUp && !middleUp && !ringUp && !pinkyUp) return '👍';
+    if (thumbUp && indexUp && middleUp && ringUp && pinkyUp) return '5';
+    if (indexUp && !middleUp && !ringUp && !pinkyUp) return '1';
+    
+    return null;
+  }
+
+  function onResults(results) {
+    if (!isDetecting || !results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
+      return;
+    }
+    
+    const prediction = recognizeGesture(results.multiHandLandmarks[0]);
+    
+    if (prediction) {
+      if (prediction === lastPrediction) {
+        predictionCount++;
+        if (predictionCount >= 10) {
+          textOutput.innerHTML += prediction;
+          predictionCount = 0;
+        }
+      } else {
+        lastPrediction = prediction;
+        predictionCount = 1;
+      }
+    }
+  }
+
+  async function startCamera() {
+    
+    // 1. VENTANA EMERGENTE (Pop-up) con tu mensaje
+    const result = await Swal.fire({
+      title: 'Recomendación',
+      text: 'Asegúrate de tener buena iluminación para mejores resultados.',
+      icon: 'info',
+      confirmButtonText: 'Entendido, iniciar',
+      confirmButtonColor: '#0d6efd', // Color azul del tema
+      showCancelButton: true,
+      cancelButtonText: 'Cancelar'
+    });
+
+    // 2. Si el usuario cierra o da cancelar, NO hacemos nada
+    if (!result.isConfirmed) return;
+
+    // 3. Si confirma, encendemos la cámara
+    try {
+      mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" },
+        audio: false,
+      });
+
+      videoElement.srcObject = mediaStream;
+      videoElement.style.display = "block";
+      placeholder.style.display = "none";
+      
+      btnStart.classList.add('d-none');
+      btnStop.classList.remove('d-none');
+      btnStop.disabled = false;
+      
+      badge.classList.add("rec-active", "text-danger");
+      badge.classList.remove("text-secondary");
+      recText.textContent = "EN VIVO";
+      
+      camStatusText.textContent = "Detectando...";
+      camStatusText.className = "badge bg-primary rounded-pill";
+
+      textOutput.className = "p-3 text-dark fw-bold flex-grow-1 text-start";
+      textOutput.style.border = "2px solid #0d6efd";
+      textOutput.style.backgroundColor = "#fff";
+      textOutput.innerHTML = "";
+      
+      // Iniciar MediaPipe Hands
+      hands = new Hands({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+      });
+      hands.setOptions({
+        maxNumHands: 1,
+        modelComplexity: 1,
+        minDetectionConfidence: 0.7,
+        minTrackingConfidence: 0.7
+      });
+      hands.onResults(onResults);
+      
+      const camera = new Camera(videoElement, {
+        onFrame: async () => {
+          if (isDetecting) {
+            await hands.send({image: videoElement});
+          }
+        },
+        width: 1280,
+        height: 720
+      });
+      camera.start();
+      isDetecting = true; 
+
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.fire('Error', 'No se pudo acceder a la cámara', 'error');
+    }
+  }
+
+  function stopCamera() {
+    if (mediaStream) {
+      isDetecting = false;
+      if (hands) {
+        hands.close();
+        hands = null;
+      }
+      
+      mediaStream.getTracks().forEach((track) => track.stop());
+      videoElement.srcObject = null;
+      
+      videoElement.style.display = "none";
+      placeholder.style.display = "block";
+      
+      btnStart.classList.remove('d-none');
+      btnStop.classList.add('d-none');
+
+      badge.classList.remove("rec-active", "text-danger");
+      badge.classList.add("text-secondary");
+      recText.textContent = "OFF";
+
+      camStatusText.textContent = "Inactiva";
+      camStatusText.className = "badge bg-secondary rounded-pill";
+      
+      textOutput.style.border = "2px dashed #dee2e6";
+      mediaStream = null;
+    }
+  }
+
+  function clearText() { textOutput.innerHTML = ""; }
+  
+  function copyText() {
+      const text = textOutput.innerText;
+      if(text) {
+          navigator.clipboard.writeText(text);
+          // Pequeña notificación (Toast) al copiar
+          const Toast = Swal.mixin({
+            toast: true, position: 'top-end', showConfirmButton: false, timer: 2000
+          });
+          Toast.fire({ icon: 'success', title: 'Texto copiado' });
+      }
+  }
+</script>
+{% endblock %}

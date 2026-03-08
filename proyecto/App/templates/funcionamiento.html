@@ -1,0 +1,110 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block title %}Cómo Funciona - Handy{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Estilos para las imágenes de la historia */
+    .story-img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover; /* Para que la imagen no se estire feo */
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    .story-img:hover {
+        transform: scale(1.02);
+    }
+    
+    .section-title {
+        color: #0d6efd; /* Azul primario */
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    
+    <div class="row text-center mb-5">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="fw-bold display-5 mb-3">¿Cómo funciona <span class="text-primary">Handy</span>?</h1>
+            <p class="lead text-muted">La tecnología al servicio de la inclusión. Descubre cómo transformamos gestos en palabras.</p>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5 pb-5">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm text-center p-4 hover-card">
+                <div class="display-4 text-primary mb-3"><i class="bi bi-camera-video"></i></div>
+                <h4>1. Activa la Cámara</h4>
+                <p class="text-muted small">Da permisos al navegador. Nuestra IA analizará los puntos clave de tus manos sin guardar video.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm text-center p-4 hover-card">
+                <div class="display-4 text-primary mb-3"><i class="bi bi-hand-index-thumb"></i></div>
+                <h4>2. Realiza las Señas</h4>
+                <p class="text-muted small">Posiciónate frente a la cámara con buena iluminación y realiza los gestos del abecedario o palabras.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm text-center p-4 hover-card">
+                <div class="display-4 text-primary mb-3"><i class="bi bi-translate"></i></div>
+                <h4>3. Traducción Instantánea</h4>
+                <p class="text-muted small">El sistema procesa el movimiento y muestra el texto traducido en tiempo real en tu pantalla.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row align-items-center mb-5 pb-4">
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            <h2 class="section-title">Nuestra Historia</h2>
+            <h4 class="fw-light mb-3">Rompiendo el silencio con tecnología</h4>
+            <p class="text-muted">
+                La idea de <strong>Handy</strong> surgió al observar las dificultades de comunicación que enfrentan diariamente las personas con discapacidad auditiva al interactuar con quienes no conocen la lengua de señas.
+            </p>
+            <p class="text-muted">
+                Lo que comenzó como una simple curiosidad académica, se transformó en una misión: 
+                <em>¿Podemos usar la cámara de un celular o computadora para ser un puente de comunicación?</em>
+                Queríamos crear una herramienta gratuita, accesible y fácil de usar que no requiriera equipos costosos.
+            </p>
+        </div>
+        <div class="col-lg-6">
+            <img src="{% static 'img/imagen_derecha.jpg' %}" 
+                 class="story-img" alt="Historia de Handy">
+        </div>
+    </div>
+
+    <div class="row align-items-center flex-row-reverse flex-lg-row mb-5">
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            <img src="{% static 'img/imagen_izquierda.jpg' %}" 
+                 class="story-img" alt="Tecnología detrás de Handy">
+        </div>
+        <div class="col-lg-6 ps-lg-5">
+            <h2 class="section-title">¿Cómo se desarrolló?</h2>
+            <h4 class="fw-light mb-3">Inteligencia Artificial y Visión por Computadora</h4>
+            <p class="text-muted">
+                El desarrollo de Handy combina programación avanzada con redes neuronales. Utilizamos librerías de visión artificial para detectar <strong>21 puntos clave en cada mano</strong>.
+            </p>
+            <ul class="list-unstyled text-muted">
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Entrenamiento:</strong> El modelo aprendió miles de imágenes de señas.</li>
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Procesamiento:</strong> Calcula la geometría de los dedos en milisegundos.</li>
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Privacidad:</strong> Todo ocurre en tu navegador, las imágenes no se envían a servidores externos.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="text-center py-5 bg-light rounded-3 mt-5">
+        <h3 class="fw-bold mb-3">¿Listo para probarlo?</h3>
+        <p class="text-muted mb-4">La comunicación no debería tener barreras. Empieza ahora.</p>
+        <a href="{% url 'index' %}" class="btn btn-primary btn-lg rounded-pill px-5 shadow">
+            <i class="bi bi-play-fill"></i> Ir al Traductor
+        </a>
+    </div>
+
+</div>
+{% endblock %}

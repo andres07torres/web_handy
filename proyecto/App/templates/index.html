@@ -1,0 +1,255 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es" class="h-100">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#0d6efd" />
+    
+    <title>{% block title %}Handy - Inicio{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+
+    {% block extra_css %}{% endblock %}
+  </head>
+
+  <body class="d-flex flex-column h-100 bg-light">
+    
+    <header>
+      <nav class="navbar navbar-expand-lg navbar-dark shadow-sm fixed-top" style="background-color: #203145;">
+        <div class="container">
+          
+          <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+            <i class="bi bi-translate text-white"></i> Handy
+          </a>
+
+          <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarMain">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 mt-2 mt-lg-0">
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'index' %}">Inicio</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'funcionamiento' %}">Cómo funciona</a>
+              </li>
+            </ul>
+
+            <div class="search-wrapper mt-3 mt-lg-0">
+              <form class="d-flex" role="search" action="{% url 'buscar' %}" method="GET" autocomplete="off">
+                <div class="input-group">
+                  <span class="input-group-text bg-secondary border-secondary text-white">
+                    <i class="bi bi-search"></i>
+                  </span>
+                  <input
+                    id="live-search-input"
+                    class="form-control form-control-dark"
+                    type="search"
+                    name="q"
+                    placeholder="Buscar..."
+                    required
+                  />
+                  <button class="btn btn-primary" type="submit">Ir</button>
+                </div>
+              </form>
+
+              <div id="search-results-panel">
+                <div class="row g-0">
+                  <div class="col-4 bg-light border-end p-0">
+                    <div class="p-3 bg-secondary bg-opacity-10 border-bottom">
+                      <h6 class="text-uppercase text-muted small fw-bold mb-0">
+                        Sugerencias
+                      </h6>
+                    </div>
+                    <ul class="list-unstyled mb-0" id="suggestions-list"></ul>
+                  </div>
+                  <div class="col-8 p-3 bg-white">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">
+                      Resultados Visuales
+                    </h6>
+                    <div class="row g-2" id="cards-container"></div>
+                  </div>
+                </div>
+              </div>
+            </div> 
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="flex-shrink-0 pt-5 mt-4">
+      <div class="container py-4">
+        
+        {% if messages %}
+        <div class="row justify-content-center">
+          <div class="col-md-8">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %} 
+        
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+
+    <footer class="footer mt-auto py-5 text-white border-top border-secondary" style="background-color: #203145;">
+      <div class="container">
+        <div class="row gy-4">
+          
+          <div class="col-lg-4 col-md-6">
+            <h6 class="d-flex align-items-center gap-2 mb-3 fw-bold text-uppercase" style="color: #ffffff">
+              <i class="bi bi-translate"></i> Handy
+            </h6>
+            <p class="text-white-50 small">
+              Rompiendo barreras lingüísticas con visión artificial e inteligencia artificial.
+            </p>
+          </div>
+
+          <div class="col-lg-2 col-md-6">
+            <h6 class="text-white text-uppercase fw-bold mb-3">Explorar</h6>
+            <ul class="list-unstyled d-flex flex-column gap-2 small">
+              <li><a href="{% url 'index' %}">Inicio</a></li>
+              <li><a href="{% url 'index' %}">Traductor en vivo</a></li>
+              <li><a href="{% url 'funcionamiento' %}">Cómo funciona</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-3 col-md-6">
+            <h6 class="text-white text-uppercase fw-bold mb-3">Ayuda</h6>
+            <ul class="list-unstyled d-flex flex-column gap-2 small">
+              <li><a href="#">Centro de Ayuda</a></li>
+              <li><a href="#">Privacidad</a></li>
+              <li><a href="#">Términos</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-3 col-md-6">
+            <h6 class="text-white text-uppercase fw-bold mb-3">Síguenos</h6>
+            <div class="d-flex gap-3 fs-5">
+              <a href="#" class="text-white hover-primary"><i class="bi bi-facebook"></i></a>
+              <a href="#" class="text-white hover-primary"><i class="bi bi-instagram"></i></a>
+              <a href="#" class="text-white hover-primary"><i class="bi bi-github"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center text-white-50 small mt-4 pt-3">
+          &copy; 2026 Handy. Todos los derechos reservados.
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Datos para la búsqueda en vivo
+        const database = [
+          {
+            title: "Traductor en Vivo",
+            keywords: "inicio home casa principal camara traducir",
+            url: "{% url 'index' %}",
+            icon: "bi-camera-video",
+            desc: "Traduce señas usando tu cámara.",
+          },
+          {
+            title: "Cómo Funciona",
+            keywords: "tutorial guia manual ayuda pasos instrucciones",
+            url: "{% url 'funcionamiento' %}",
+            icon: "bi-info-circle",
+            desc: "Guía paso a paso para usar Handy.",
+          },
+
+        ];
+
+        const input = document.getElementById("live-search-input");
+        const panel = document.getElementById("search-results-panel");
+        const suggestionsList = document.getElementById("suggestions-list");
+        const cardsContainer = document.getElementById("cards-container");
+
+        function showResults(query) {
+          suggestionsList.innerHTML = "";
+          cardsContainer.innerHTML = "";
+
+          const results = database.filter(
+            (item) =>
+              item.keywords.includes(query) ||
+              item.title.toLowerCase().includes(query)
+          );
+
+          if (results.length > 0) {
+            results.forEach((item) => {
+              // Crear item de lista
+              const li = document.createElement("li");
+              li.className = "suggestion-item";
+              li.innerHTML = `<i class="bi bi-search me-2 text-muted"></i> ${item.title}`;
+              li.onclick = () => (window.location.href = item.url);
+              suggestionsList.appendChild(li);
+
+              // Crear tarjeta visual
+              const col = document.createElement("div");
+              col.className = "col-md-12";
+              col.innerHTML = `
+                <div class="card result-card h-100 p-2 shadow-sm" onclick="window.location.href='${item.url}'">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 p-3 rounded me-3 text-primary">
+                            <i class="bi ${item.icon} fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1 fw-bold text-dark">${item.title}</h6>
+                            <small class="text-muted">${item.desc}</small>
+                        </div>
+                    </div>
+                </div>
+              `;
+              cardsContainer.appendChild(col);
+            });
+            panel.style.display = "block";
+          } else {
+            // Sin resultados
+            suggestionsList.innerHTML = '<li class="p-3 text-muted small">No hay coincidencias</li>';
+            cardsContainer.innerHTML = '<div class="text-center p-3 text-muted"><i class="bi bi-emoji-frown fs-1"></i><p>Sin resultados</p></div>';
+            panel.style.display = "block";
+          }
+        }
+
+        input.addEventListener("input", function () {
+          const query = this.value.toLowerCase().trim();
+          if (query.length > 0) {
+            showResults(query);
+          } else {
+            panel.style.display = "none";
+          }
+        });
+
+        input.addEventListener("focus", function () {
+          if (this.value.trim() === "") {
+            showResults("");
+          } else {
+            showResults(this.value.toLowerCase().trim());
+          }
+        });
+
+        document.addEventListener("click", function (e) {
+          if (!input.contains(e.target) && !panel.contains(e.target)) {
+            panel.style.display = "none";
+          }
+        });
+      });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

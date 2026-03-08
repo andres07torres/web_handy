@@ -1,0 +1,91 @@
+body {
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+footer a {
+  text-decoration: none;
+  color: #ced4da;
+  transition: color 0.3s;
+}
+
+footer a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.form-control-dark {
+  background-color: #343a40;
+  border-color: #495057;
+  color: #fff;
+}
+
+.form-control-dark:focus {
+  background-color: #343a40;
+  border-color: #0d6efd;
+  color: #fff;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.form-control-dark::placeholder {
+  color: #adb5bd;
+}
+
+/* --- ESTILOS DEL BUSCADOR FLOTANTE --- */
+.search-wrapper {
+  position: relative;
+}
+
+#search-results-panel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 600px;
+  background: white;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  display: none;
+  border: 1px solid #dee2e6;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  #search-results-panel {
+    width: 100%;
+    left: 0;
+    position: fixed;
+    top: 60px;
+    border-radius: 0;
+  }
+}
+
+.suggestion-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  color: #333;
+  border-bottom: 1px solid #f0f0f0;
+  transition: all 0.2s;
+}
+
+.suggestion-item:hover {
+  background-color: #e9ecef;
+  color: #0d6efd;
+  padding-left: 20px;
+}
+
+.result-card {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid #f0f0f0;
+}
+
+.result-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+  border-color: #0d6efd;
+}
