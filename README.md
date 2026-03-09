@@ -204,7 +204,6 @@ Este proyecto está bajo la Licencia MIT. Consulta el archivo `LICENSE` para má
 ¿Preguntas o sugerencias? No dudes en contactar:
 
 - 📧 Email: andres07torresg@gmail.com
-- 🐦 Twitter: [@tu_usuario](https://twitter.com/tu_usuario)
 - 💼 LinkedIn: [Tu Perfil](www.linkedin.com/in/carlos-torres-guaman)
 
 ---
